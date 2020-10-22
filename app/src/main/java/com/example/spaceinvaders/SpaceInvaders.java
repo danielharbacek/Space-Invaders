@@ -15,6 +15,11 @@ public class SpaceInvaders extends SurfaceView implements SurfaceHolder.Callback
     private MainThread mainThread;
 
     private Invaders invaders;
+    private Player player;
+    private Bullets bullets;
+
+    long lastShot = System.currentTimeMillis();
+    int timeBetweenShooting = 1000;     //in miliseconds
 
     public SpaceInvaders(Context context) {
         super(context);
@@ -38,7 +43,9 @@ public class SpaceInvaders extends SurfaceView implements SurfaceHolder.Callback
         mainThread = new MainThread(surfaceHolder, this);
         setFocusable(true);
 
-        invaders = new Invaders(100, 100, 100);
+        invaders = new Invaders(50, 100, 100);
+        player = new Player(BitmapFactory.decodeResource(getResources(), R.drawable.ship), 200, 100);
+        bullets = new Bullets(50, 10, 30);
     }
 
     @Override
@@ -46,7 +53,7 @@ public class SpaceInvaders extends SurfaceView implements SurfaceHolder.Callback
         mainThread.setRunning(true);
         mainThread.start();
 
-        invaders.addNewInvader(BitmapFactory.decodeResource(getResources(), R.drawable.invader1), 100, 100);
+        //invaders.addNewInvader(BitmapFactory.decodeResource(getResources(), R.drawable.invader1), 100, 100);
     }
 
     @Override
@@ -71,6 +78,8 @@ public class SpaceInvaders extends SurfaceView implements SurfaceHolder.Callback
 
     public void update(){
         invaders.update();
+        player.update();
+        bullets.update();
     }
 
     @Override
@@ -79,6 +88,26 @@ public class SpaceInvaders extends SurfaceView implements SurfaceHolder.Callback
 
         if(canvas != null){
             invaders.draw(canvas);
+            player.draw(canvas);
+            bullets.draw(canvas);
+            playerShoot();
+        }
+    }
+
+    public void movePlayerLeft(){
+        player.moveLeft();
+    }
+
+    public void movePlayerRight(){
+        player.moveRight();
+    }
+
+    public void playerShoot(){
+        long time = System.currentTimeMillis();
+        if(time - lastShot >= timeBetweenShooting){
+            bullets.addNewBullet(BitmapFactory.decodeResource(getResources(), R.drawable.missile),
+                    player.getBulletX() - 5, player.getY() - 50, "player");
+            lastShot = time;
         }
     }
 }
