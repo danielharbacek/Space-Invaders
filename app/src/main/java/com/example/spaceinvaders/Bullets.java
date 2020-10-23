@@ -7,22 +7,21 @@ import java.util.ArrayList;
 
 public class Bullets {
     private ArrayList<Bullet> bullets;
-    private int width;
-    private int height;
 
-    public Bullets(int count, int width, int height){
+    public Bullets(){
         bullets = new ArrayList<Bullet>();
-        this.width = width;
-        this.height = height;
     }
 
-    public void addNewBullet(Bitmap bitmap, int x, int y, String shooter){
-        bullets.add(new Bullet(bitmap, x ,y, width, height, shooter));
+    public void addNewBullet(Bitmap bitmap, int x, int y, int width, int height, int speed, String shooter){
+        bullets.add(new Bullet(bitmap, x ,y, width, height, speed, shooter));
     }
 
     public void update(){
         for (Bullet bullet : bullets) {
             bullet.update();
+            if(bullet.getX() < -50){
+                bullets.remove(bullet);
+            }
         }
     }
 
@@ -30,5 +29,13 @@ public class Bullets {
         for (Bullet bullet : bullets) {
             bullet.draw(canvas);
         }
+    }
+
+    public ArrayList<Bullet> getBullets(){
+        return this.bullets;
+    }
+
+    public void removeBullet(Bullet bullet){
+        bullets.remove(bullet);
     }
 }

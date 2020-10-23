@@ -2,10 +2,8 @@ package com.example.spaceinvaders;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
+import android.graphics.Rect;
 import android.util.Log;
-import android.view.MotionEvent;
 
 public class Player {
     private Bitmap bitmap;
@@ -13,24 +11,24 @@ public class Player {
     private int y;
     private final int height;
     private final int width;
-    private int xVelicoty = 5;
+    private int xVelocity = 5;
 
     public Player(Bitmap bitmap, int width, int height){
-        this.bitmap = Bitmap.createScaledBitmap(bitmap, width, height, false);;
+        this.bitmap = bitmap;
         this.width = width;
         this.height = height;
         this.x = MainActivity.getScreenWidth() / 2 - this.width / 2;
-        this.y = MainActivity.getScreenHeight() - this.height - 100;
+        this.y = MainActivity.getScreenHeight() - this.height - 20;
     }
 
     public void update(){
-        if(xVelicoty < 0){      //go left
-            if(x > 0 + Math.abs(xVelicoty)){
-                x += xVelicoty;
+        if(xVelocity < 0){      //go left
+            if(x > 0 + Math.abs(xVelocity)){
+                x += xVelocity;
             }
         }else{                  //go right
-            if(x < MainActivity.getScreenWidth() - width - Math.abs(xVelicoty)){
-                x += xVelicoty;
+            if(x < MainActivity.getScreenWidth() - width - Math.abs(xVelocity)){
+                x += xVelocity;
             }
         }
 
@@ -41,11 +39,11 @@ public class Player {
     }
 
     public void moveLeft(){
-        xVelicoty = -5;
+        xVelocity = -5;
     }
 
     public void moveRight(){
-        xVelicoty = 5;
+        xVelocity = 5;
     }
 
     public void shoot(){
@@ -59,5 +57,17 @@ public class Player {
 
     public int getY(){
         return this.y;
+    }
+
+    public Rect getRect(){
+        return new Rect(x, y, x + width, y + height);
+    }
+
+    public int getX(){
+        return this.x;
+    }
+
+    public void moveAway(){
+        y = MainActivity.getScreenHeight() + height + 50;
     }
 }

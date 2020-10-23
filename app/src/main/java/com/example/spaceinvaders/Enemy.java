@@ -15,16 +15,18 @@ public class Enemy {
     private int height;
     private int speed;
     private int points;
+    private int coins;
     private boolean isDead;
 
-    public Enemy(Bitmap bitmap, int width, int height, int speed, int points){
+    public Enemy(Bitmap bitmap, int width, int height, int speed, int points, int coins){
         this.bitmap = bitmap;
-        this.x = randomNumber(100, MainActivity.getScreenWidth() - width);
-        this.y = 0 - height;
+        this.x = randomNumber(0, MainActivity.getScreenWidth() - width);
+        this.y = 200 - height;
         this.width = width;
         this.height = height;
         this.speed = speed;
         this.points = points;
+        this.coins = coins;
         isDead = false;
     }
 
@@ -66,6 +68,10 @@ public class Enemy {
 
     public int getPoints(){
         return this.points;
+    }
+
+    public int getCoins(){
+        return this.coins;
     }
 
     public void die(){
