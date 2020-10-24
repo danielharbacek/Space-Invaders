@@ -35,12 +35,13 @@ public class GameOverActivity extends AppCompatActivity {
 
         scoreText.setText("Score: " + score);
         highscoreText.setText("High score: " + highscore);
-        coinsText.setText("Coins: " + coins + " (+" + earnedCoins + ")");
+        coinsText.setText("Coins: " + coins + earnedCoins + " (+" + earnedCoins + ")");
 
     }
 
     public void proceed(View view) {
         Intent intent = new Intent(this, MenuActivity.class);
+        intent.putExtra("theme", false);
         startActivity(intent);
     }
 }

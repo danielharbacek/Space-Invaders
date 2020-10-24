@@ -17,21 +17,12 @@ public class Enemies {
     }
 
     public void update(){
-        //faster than for-each version
         for(int i = 0; i < enemies.size(); i++){
             if(enemies.get(i).getY() > MainActivity.getScreenHeight() + 20){
                 enemies.remove(i);
             }
             enemies.get(i).update();
         }
-
-        /*
-        for (Enemy enemy : enemies) {
-            if(enemy.getY() > MainActivity.getScreenHeight() + 20){
-                enemies.remove(enemy);
-            }
-            enemy.update();
-        }*/
     }
 
     public void draw(Canvas canvas){

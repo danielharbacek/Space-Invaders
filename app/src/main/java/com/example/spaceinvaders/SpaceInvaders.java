@@ -11,6 +11,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.media.MediaPlayer;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
@@ -51,19 +52,20 @@ public class SpaceInvaders extends SurfaceView implements SurfaceHolder.Callback
     private Bitmap hearthBitmap;
     private Bitmap coinBitmap;
     private Bitmap[] explosion;
+    private Bitmap[] playerExplosionSmall;
     private Bitmap[] playerExplosion;
 
-    private int shootRate = 1000;               //in miliseconds
-    private int enemySpawnRate = 2000;          //in miliseconds
-    private int streakRate = 3000;               //in miliseconds
-    private int gameOverDelay = 2000;
+    private int shootRate = 500;               //in miliseconds
+    private int enemySpawnRate = 1000;          //in miliseconds
+    private int streakRate = 2000;               //in miliseconds
+    private int gameOverDelay = 3000;
 
     private int enemyPoints;
     private int enemyCoins;
     private int score = 0;
     private int streak = 0;
     private int coins = 0;
-    private int maxLives = 3;
+    private int maxLives = 2;
     private int lives;
     private int highScore;
     private boolean isGameOver = false;
@@ -102,49 +104,24 @@ public class SpaceInvaders extends SurfaceView implements SurfaceHolder.Callback
         mainThread = new MainThread(surfaceHolder, this);
         setFocusable(true);
 
-        playerBitmap = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),
-                R.drawable.ship1), playerWidth, playerHeight, false);
-        bulletBitmap = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),
-                R.drawable.rocket), bulletWidth, bulletHeight, false);
-        enemyBitmap01 = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),
-                R.drawable.enemy4), enemyWidth, enemyHeight, false);
-        background = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),
-                R.drawable.background), MainActivity.getScreenWidth(), MainActivity.getScreenHeight(), false);
-        hearthBitmap = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),
-                R.drawable.hearth), hearthWidth, hearthHeight, false);
-        coinBitmap = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),
-                R.drawable.coin), coinWidth, coinHeight, false);
-        fillExplosionBitmap();
+        loadPrefs();
+
+        loadBitmaps();
 
         enemies = new Enemies();
         player = new Player(playerBitmap, playerWidth, playerHeight);
         bullets = new Bullets();
         explosions = new ArrayList<>();
 
+        shotSound = MediaPlayer.create(getContext(), R.raw.shot1);
+        explosionSound = MediaPlayer.create(getContext(), R.raw.explosion_long);
+
         lives = maxLives;
         enemyPoints = 10;
         enemyCoins = 2;
 
-        spawnTimer = new Timer();
-        spawnTimer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                enemies.spawnEnemy(enemyBitmap01, enemyWidth, enemyHeight, enemySpeed, enemyPoints, enemyCoins);
-            }
-        }, enemySpawnRate, enemySpawnRate);
-
-        shotTimer = new Timer();
-        shotTimer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                shotSound.start();
-                bullets.addNewBullet(bulletBitmap, player.getBulletX() - bulletWidth / 2, player.getY() - bulletHeight / 2,
-                        bulletWidth, bulletHeight, bulletSpeed, "player");
-            }
-        }, shootRate, shootRate);
-
-        shotSound = MediaPlayer.create(getContext(), R.raw.shot1);
-        explosionSound = MediaPlayer.create(getContext(), R.raw.explosion);
+        scheduleEnemySpawn();
+        scheduleBulletShot();
 
         paint = new Paint();
         paint.setAntiAlias(true);
@@ -180,6 +157,8 @@ public class SpaceInvaders extends SurfaceView implements SurfaceHolder.Callback
         }
 
         saveHighscoreAndCoins();
+        spawnTimer.cancel();
+        shotTimer.cancel();
     }
 
     public void update(){
@@ -202,9 +181,9 @@ public class SpaceInvaders extends SurfaceView implements SurfaceHolder.Callback
             player.draw(canvas);
             bullets.draw(canvas);
 
-            for(Explosion explosion : explosions){
-                if(explosion.drawNextFrame(canvas) == 17){
-                    explosions.remove(explosion);
+            for(int i = 0; i < explosions.size(); i++){
+                if(explosions.get(i).drawNextFrame(canvas) == 17){
+                    explosions.remove(i);
                 }
             }
 
@@ -219,6 +198,48 @@ public class SpaceInvaders extends SurfaceView implements SurfaceHolder.Callback
 
     public void movePlayerRight(){
         player.moveRight();
+    }
+
+    private void loadPrefs(){
+        //TODO: load shared preferences to set lives, damage and player speed
+    }
+
+    private void loadBitmaps(){
+        playerBitmap = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),
+                R.drawable.ship1), playerWidth, playerHeight, false);
+        bulletBitmap = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),
+                R.drawable.rocket), bulletWidth, bulletHeight, false);
+        enemyBitmap01 = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),
+                R.drawable.enemy4), enemyWidth, enemyHeight, false);
+        background = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),
+                R.drawable.background), MainActivity.getScreenWidth(), MainActivity.getScreenHeight(), false);
+        hearthBitmap = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),
+                R.drawable.hearth), hearthWidth, hearthHeight, false);
+        coinBitmap = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),
+                R.drawable.coin), coinWidth, coinHeight, false);
+        fillExplosionBitmap();
+    }
+
+    private void scheduleEnemySpawn(){
+        spawnTimer = new Timer();
+        spawnTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                enemies.spawnEnemy(enemyBitmap01, enemyWidth, enemyHeight, enemySpeed, enemyPoints, enemyCoins);
+            }
+        }, enemySpawnRate, enemySpawnRate);
+    }
+
+    private void scheduleBulletShot(){
+        shotTimer = new Timer();
+        shotTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                shotSound.start();
+                bullets.addNewBullet(bulletBitmap, player.getBulletX() - bulletWidth / 2, player.getY() - bulletHeight / 2,
+                        bulletWidth, bulletHeight, bulletSpeed, "player");
+            }
+        }, shootRate, shootRate);
     }
 
     private void checkCollision(Canvas canvas){
@@ -255,12 +276,14 @@ public class SpaceInvaders extends SurfaceView implements SurfaceHolder.Callback
 
     private void fillExplosionBitmap(){
         explosion = new Bitmap[17];
+        playerExplosionSmall = new Bitmap[17];
         playerExplosion = new Bitmap[17];
 
         for(int i = 0; i < 17; i++){
             Bitmap bitmap = BitmapFactory.decodeResource(getResources(),
                     getResources().getIdentifier("explosion"+(i+1), "drawable", getContext().getPackageName()));
             explosion[i] = Bitmap.createScaledBitmap(bitmap, enemyWidth, enemyHeight, false);
+            playerExplosionSmall[i] = Bitmap.createScaledBitmap(bitmap, playerWidth / 2, playerHeight / 2, false);
             playerExplosion[i] = Bitmap.createScaledBitmap(bitmap, playerWidth, playerHeight, false);
         }
     }
@@ -300,8 +323,6 @@ public class SpaceInvaders extends SurfaceView implements SurfaceHolder.Callback
 
         editor.putInt("coins", allCoins);
 
-        editor.putInt("coins", allCoins);
-
         editor.commit();
     }
 
@@ -310,11 +331,12 @@ public class SpaceInvaders extends SurfaceView implements SurfaceHolder.Callback
     }
 
     private void gameOver(){
+        explosionSound.start();
+
         isGameOver = true;
         shotTimer.cancel();
-        explosionSound.start();
-        explosions.add(new Explosion(playerExplosion, player.getX(), player.getY()));
-        player.moveAway();
+
+        blowUpPlayer();
 
         new Timer().schedule(new TimerTask() {
             @Override
@@ -326,5 +348,44 @@ public class SpaceInvaders extends SurfaceView implements SurfaceHolder.Callback
                 getContext().startActivity(intent);
             }
         }, gameOverDelay);
+    }
+
+    private void blowUpPlayer(){
+
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                explosions.add(new Explosion(playerExplosionSmall, player.getX() + playerWidth/3, player.getY() + playerHeight/6));
+            }
+        }, 500);
+
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                explosions.add(new Explosion(playerExplosionSmall, player.getX() + playerWidth/6, player.getY() + playerHeight/3));
+            }
+        }, 850);
+
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                explosions.add(new Explosion(playerExplosionSmall, player.getX() + playerWidth/4, player.getY() + playerHeight/2));
+            }
+        }, 1200);
+
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                explosions.add(new Explosion(playerExplosionSmall, player.getX() + playerWidth/3, player.getY() + playerHeight/3));
+            }
+        }, 1700);
+
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                explosions.add(new Explosion(playerExplosion, player.getX(), player.getY()));
+                player.moveAway();
+            }
+        }, 2000);
     }
 }

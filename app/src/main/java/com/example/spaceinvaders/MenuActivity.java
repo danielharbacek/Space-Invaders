@@ -4,22 +4,34 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.View;
 
 public class MenuActivity extends AppCompatActivity {
 
-    MediaPlayer theme;
+    private MediaPlayer theme;
+
+    SharedPreferences sharedprefs;
+    public static final String PrefsName = "MyPrefs";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu);
 
+        sharedprefs = getSharedPreferences(PrefsName, 0);
+        SharedPreferences.Editor editor = sharedprefs.edit();
+        editor.putBoolean("ship0", true);
+        editor.commit();
+
         theme = MediaPlayer.create(this, R.raw.theme);
         theme.setLooping(true);
-        theme.start();
+
+        if(getIntent().getBooleanExtra("theme", true)){
+            theme.start();
+        }
     }
 
     public void play(View view) {
@@ -33,18 +45,6 @@ public class MenuActivity extends AppCompatActivity {
 
     public void upgrade(View view) {
         Intent intent = new Intent(MenuActivity.this, UpgradeActivity.class);
-        startActivityForResult(intent, 100);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if(data == null)
-            return;
-
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if(requestCode == 100){
-
-        }
+        startActivity(intent);
     }
 }
