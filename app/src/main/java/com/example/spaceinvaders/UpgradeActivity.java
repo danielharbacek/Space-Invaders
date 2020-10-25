@@ -20,16 +20,26 @@ public class UpgradeActivity extends AppCompatActivity {
     public static final String PrefsName = "MyPrefs";
     private int coins;
 
+    private static final String[] shipNames = {
+            "Battlestar Galactica",
+            "USS Enterprise",
+            "Millennium Falcon",
+            "The Resolute",
+            "Serenity"};
+
     private TextView coinsText;
     private TextView livesText;
     private TextView damageText;
     private TextView gunText;
     private TextView speedText;
+    
     private TextView shipCost;
     private TextView livesCost;
     private TextView damageCost;
     private TextView gunCost;
     private TextView speedCost;
+    
+    private TextView shipName;
 
     private ImageView shipImage;
     private ImageView plusLives;
@@ -73,6 +83,7 @@ public class UpgradeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_upgrade);
 
         sharedprefs = getSharedPreferences(PrefsName, 0);
+
         upgradeSound = MediaPlayer.create(getApplicationContext(), R.raw.drill1);
 
         shipsCount = 5;
@@ -88,6 +99,8 @@ public class UpgradeActivity extends AppCompatActivity {
 
         coins = sharedprefs.getInt("coins", 0);
         coinsText.setText(coins + "");
+
+        shipName.setText(shipNames[currentShip]);
     }
 
     private void initCosts(){
@@ -121,6 +134,8 @@ public class UpgradeActivity extends AppCompatActivity {
         damageCost = findViewById(R.id.damageCost);
         gunCost = findViewById(R.id.gunCost);
         speedCost = findViewById(R.id.speedCost);
+
+        shipName = findViewById(R.id.shipName);
 
         shipImage = findViewById(R.id.shipImage);
         plusLives = findViewById(R.id.plusLives);
@@ -173,23 +188,26 @@ public class UpgradeActivity extends AppCompatActivity {
     }
 
     private void updateStats(){
-        livesText.setText("Lives: " + (currentLives[currentShip] + 2));
+        int lives = currentLives[currentShip] + 2 + (currentShip / 2);
+        livesText.setText("Lives: " + lives);
 
-        damageText.setText("Damage: " + currentDamage[currentShip] * (100 + 50));
+        int damage = currentDamage[currentShip] * 50 + 100 + (currentShip+1) * 25 + currentDamage[currentShip]*10*currentShip;
+        damageText.setText("Damage: " + damage);
 
         String text = "Gun: ";
         if(currentGun[currentShip] == 0){
             text += "missile";
         }else if(currentGun[currentShip] == 1){
-            text += "double missile";
-        }else if(currentGun[currentShip] == 2){
             text += "laser";
+        }else if(currentGun[currentShip] == 2){
+            text += "double missile";
         }else if(currentGun[currentShip] == 3){
             text += "double laser";
         }
         gunText.setText(text);
 
-        speedText.setText("Speed: " + (currentSpeed[currentShip] + 5));
+        int speed = currentSpeed[currentShip] + 7;
+        speedText.setText("Speed: " + speed);
     }
 
     private void viewLives(int i){
@@ -278,12 +296,14 @@ public class UpgradeActivity extends AppCompatActivity {
         updateCosts();
         updateStats();
         checkMaxUpgrade();
+        
+        shipName.setText(shipNames[currentShip]);
     }
 
     public void arrowLeft(View view) {
         if(currentShip == 0){
             currentShip = ships.length-1;
-                    shipImage.setImageBitmap(ships[currentShip]);
+            shipImage.setImageBitmap(ships[currentShip]);
         }else{
             shipImage.setImageBitmap(ships[--currentShip]);
         }
@@ -291,6 +311,8 @@ public class UpgradeActivity extends AppCompatActivity {
         updateCosts();
         updateStats();
         checkMaxUpgrade();
+
+        shipName.setText(shipNames[currentShip]);
     }
 
     public void buyShip(View view) {

@@ -11,12 +11,15 @@ public class Player {
     private int y;
     private final int height;
     private final int width;
-    private int xVelocity = 5;
+    private int xVelocity;
+    private int damage;
 
-    public Player(Bitmap bitmap, int width, int height){
+    public Player(Bitmap bitmap, int width, int height, int damage, int speed){
         this.bitmap = bitmap;
         this.width = width;
         this.height = height;
+        this.damage = damage;
+        this.xVelocity = speed;
         this.x = MainActivity.getScreenWidth() / 2 - this.width / 2;
         this.y = MainActivity.getScreenHeight() - this.height - 20;
     }
@@ -26,12 +29,11 @@ public class Player {
             if(x > 0 + Math.abs(xVelocity)){
                 x += xVelocity;
             }
-        }else{                  //go right
+        }else if(xVelocity > 0){                  //go right
             if(x < MainActivity.getScreenWidth() - width - Math.abs(xVelocity)){
                 x += xVelocity;
             }
         }
-
     }
 
     public void draw(Canvas canvas){
@@ -39,20 +41,25 @@ public class Player {
     }
 
     public void moveLeft(){
-        xVelocity = -5;
+        if(xVelocity > 0)
+            xVelocity = -xVelocity;
     }
 
     public void moveRight(){
-        xVelocity = 5;
-    }
-
-    public void shoot(){
-        Log.d("touch", "shoot");
-
+        if(xVelocity < 0)
+        xVelocity = -xVelocity;
     }
 
     public int getBulletX(){
         return x + width / 2;
+    }
+
+    public int getDamage(){
+        return this.damage;
+    }
+
+    public void stopMoving(){
+        xVelocity = 0;
     }
 
     public int getY(){

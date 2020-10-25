@@ -35,7 +35,7 @@ public class MenuActivity extends AppCompatActivity {
     }
 
     public void play(View view) {
-        Intent intent = new Intent(MenuActivity.this, MainActivity.class);
+        Intent intent = new Intent(MenuActivity.this, ChoosingActivity.class);
         startActivity(intent);
     }
 

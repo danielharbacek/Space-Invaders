@@ -17,8 +17,9 @@ public class Enemy {
     private int points;
     private int coins;
     private boolean isDead;
+    private int health;
 
-    public Enemy(Bitmap bitmap, int width, int height, int speed, int points, int coins){
+    public Enemy(Bitmap bitmap, int width, int height, int speed, int points, int coins, int health){
         this.bitmap = bitmap;
         this.x = randomNumber(0, MainActivity.getScreenWidth() - width);
         this.y = 200 - height;
@@ -27,6 +28,7 @@ public class Enemy {
         this.speed = speed;
         this.points = points;
         this.coins = coins;
+        this.health = health;
         isDead = false;
     }
 
@@ -42,16 +44,32 @@ public class Enemy {
         y += speed;
     }
 
-    public void setSpeed(int speed){
-        this.speed = speed;
-    }
-
     private int randomNumber(int min, int max){
         Random rn = new Random();
         int range = max - min + 1;
         int randomNum =  rn.nextInt(range) + min;
 
         return randomNum;
+    }
+
+    public Bitmap getBitmap(){
+        return this.bitmap;
+    }
+
+    public int getWidth(){
+        return this.width;
+    }
+
+    public int getHeight(){
+        return this.height;
+    }
+
+    public int getHealth(){
+        return this.health;
+    }
+
+    public int getSpeed(){
+        return this.speed;
     }
 
     public int getX(){
@@ -80,5 +98,11 @@ public class Enemy {
 
     public boolean isDead(){
         return isDead;
+    }
+
+    public int decreaseHealth(int damage){
+        health -= damage;
+
+        return health;
     }
 }

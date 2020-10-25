@@ -12,8 +12,8 @@ public class Enemies {
         enemies = new ArrayList<>();
     }
 
-    public void spawnEnemy(Bitmap bitmap, int width, int height, int speed, int points, int coins){
-        enemies.add(new Enemy(bitmap, width, height, speed, points, coins));
+    public void spawnEnemy(Bitmap bitmap, int width, int height, int speed, int points, int coins, int health){
+        enemies.add(new Enemy(bitmap, width, height, speed, points, coins, health));
     }
 
     public void update(){
