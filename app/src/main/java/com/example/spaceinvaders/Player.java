@@ -50,6 +50,14 @@ public class Player {
         xVelocity = -xVelocity;
     }
 
+    public void addBonusDamage(){
+        damage *= 2;
+    }
+
+    public void removeBonusDamage(){
+        damage /= 2;
+    }
+
     public int getBulletX(){
         return x + width / 2;
     }

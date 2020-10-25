@@ -52,6 +52,14 @@ public class Enemy {
         return randomNum;
     }
 
+    public void decreaseSpeed(){
+        speed /= 2;
+    }
+
+    public void increaseSpeed(){
+        speed *= 2;
+    }
+
     public Bitmap getBitmap(){
         return this.bitmap;
     }

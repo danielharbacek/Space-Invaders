@@ -16,6 +16,18 @@ public class Enemies {
         enemies.add(new Enemy(bitmap, width, height, speed, points, coins, health));
     }
 
+    public void decreaseSpeed(){
+        for(int i = 0; i < enemies.size(); i++){
+            enemies.get(i).decreaseSpeed();
+        }
+    }
+
+    public void increaseSpeed(){
+        for(int i = 0; i < enemies.size(); i++){
+            enemies.get(i).increaseSpeed();
+        }
+    }
+
     public void update(){
         for(int i = 0; i < enemies.size(); i++){
             if(enemies.get(i).getY() > MainActivity.getScreenHeight() + 20){

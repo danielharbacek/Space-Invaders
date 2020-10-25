@@ -206,7 +206,7 @@ public class UpgradeActivity extends AppCompatActivity {
         }
         gunText.setText(text);
 
-        int speed = currentSpeed[currentShip] + 7;
+        int speed = currentSpeed[currentShip] + 9;
         speedText.setText("Speed: " + speed);
     }
 

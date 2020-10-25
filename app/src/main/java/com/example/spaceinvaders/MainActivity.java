@@ -1,23 +1,12 @@
 package com.example.spaceinvaders;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.solver.widgets.ConstraintWidget;
-
-import android.content.Context;
 import android.content.res.Resources;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.os.Handler;
-import android.util.Log;
-import android.view.Display;
-import android.view.GestureDetector;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.WindowManager;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
