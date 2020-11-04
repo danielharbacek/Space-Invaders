@@ -8,11 +8,22 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.Console;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
 
 public class UpgradeActivity extends AppCompatActivity {
 
@@ -103,6 +114,23 @@ public class UpgradeActivity extends AppCompatActivity {
         shipName.setText(shipNames[currentShip]);
     }
 
+    private String readJSONFile(String fileName){
+        String json = null;
+        try {
+            InputStream is = getAssets().open(fileName);
+            int size = is.available();
+            byte[] buffer = new byte[size];
+            is.read(buffer);
+            is.close();
+            json = new String(buffer, "UTF-8");
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return null;
+        }
+
+        return json;
+    }
+
     private void initCosts(){
         shipsCosts = new int[shipsCount];
         livesCosts = new int[shipsCount][upgradesCount];
@@ -110,15 +138,29 @@ public class UpgradeActivity extends AppCompatActivity {
         gunCosts = new int[shipsCount][upgradesCount];
         speedCosts = new int[shipsCount][upgradesCount];
 
-        for(int i = 0; i < shipsCount; i++){
-            shipsCosts[i] = 2000 * i;
-            for(int j = 0; j < upgradesCount; j++){
-                livesCosts[i][j] = 200 + 150 * i + (j+1) * 250;
-                damageCosts[i][j] = 150 + 100 * i + (j+1) * 200;
-                gunCosts[i][j] = 300 + 100 * i + (j+1) * 150;
-                speedCosts[i][j] = 100 + 50 * i + (j+1) * 50;
-            }
+        String jsonString = readJSONFile("UpgradesCosts.json");
 
+        try{
+            JSONObject json = new JSONObject(jsonString);
+            JSONObject[] ships = new JSONObject[shipsCount];
+            for(int i = 0; i < shipsCount; i++){
+                if(i == 0){
+                    shipsCosts[i] = 0;
+                }else{
+                    shipsCosts[i] = json.getJSONObject("ships").getInt(String.valueOf(i+1));
+                }
+
+                ships[i] = json.getJSONObject("ship" + (i+1));
+                for(int j = 0; j < upgradesCount; j++){
+                    JSONObject oneUpgrade = ships[i].getJSONObject(String.valueOf(j+1));
+                    livesCosts[i][j] = oneUpgrade.getInt("lives");
+                    damageCosts[i][j] = oneUpgrade.getInt("damage");
+                    gunCosts[i][j] = oneUpgrade.getInt("gun");
+                    speedCosts[i][j] = oneUpgrade.getInt("speed");
+                }
+            }
+        }catch (JSONException ex){
+            ex.printStackTrace();
         }
     }
 
