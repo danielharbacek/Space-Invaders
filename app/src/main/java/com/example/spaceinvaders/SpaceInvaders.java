@@ -11,7 +11,6 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.media.MediaPlayer;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
@@ -107,7 +106,6 @@ public class SpaceInvaders extends SurfaceView implements SurfaceHolder.Callback
     
     public SpaceInvaders(Context context) {
         super(context);
-        Log.d("dd", "constructor");
         init();
     }
 
@@ -122,7 +120,6 @@ public class SpaceInvaders extends SurfaceView implements SurfaceHolder.Callback
     }
 
     private void init(){
-        Log.d("dd", "init start");
         sharedprefs = getContext().getSharedPreferences(PrefsName, 0);
         highScore = sharedprefs.getInt("highscore", 0);
 
@@ -152,19 +149,16 @@ public class SpaceInvaders extends SurfaceView implements SurfaceHolder.Callback
 
         mainThread = new MainThread(surfaceHolder, this);
         setFocusable(true);
-        Log.d("dd", "init end");
     }
 
     @Override
     public void surfaceCreated(@NonNull SurfaceHolder holder) {
         mainThread.setRunning(true);
         mainThread.start();
-        Log.d("dd", "surface created");
     }
 
     @Override
     public void surfaceChanged(@NonNull SurfaceHolder holder, int format, int width, int height) {
-        Log.d("dd", "surface changed");
     }
 
     @Override
@@ -187,7 +181,6 @@ public class SpaceInvaders extends SurfaceView implements SurfaceHolder.Callback
     }
 
     public void update(){
-        Log.d("dd", "update");
         if(frames > 60){
             if(!scheduled){
                 scheduleEnemySpawn();
@@ -216,7 +209,6 @@ public class SpaceInvaders extends SurfaceView implements SurfaceHolder.Callback
     @Override
     public void draw(Canvas canvas) {
         super.draw(canvas);
-        Log.d("dd", "draw");
         if(canvas != null){
             canvas.drawBitmap(background, 0, 0, null);
             enemies.draw(canvas);
